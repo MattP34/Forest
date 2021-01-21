@@ -1,4 +1,4 @@
-#Welcome to the Forest Programming Language!
+# Welcome to the Forest Programming Language!
 
 This language was created by Matthew Propp as part of the Honors Programming
 Languages Curriculum at Westminster in Spring 2021.
@@ -6,13 +6,13 @@ Languages Curriculum at Westminster in Spring 2021.
 Forest is a programming language where the entire program is represented
 by a tree data structure.
 
-##Print
+## Print
 In Forest, the print command is `print(string)`
 ```
 print("Hello World"); //prints Hello World
 ```
 
-##Variables
+## Variables
 Forest is a weakly typed language
 Supported data types include
 ```
@@ -22,7 +22,7 @@ double
 char
 string
 ```
-###Declaring Variables
+### Declaring Variables
 Variables are declared from their composite values
 
 a child of a node is created using the `->` operator
@@ -35,12 +35,12 @@ variable values are stores by the most recent declaration but previous declarati
 ```
 =(5)->x;
 ```
-###Changing Variables
+### Changing Variables
 Variable values are stores by the most recent declaration but previous declaration can still be accessed through the graph
 ```
 =(10)->x;
 ```
-###Accessing Variables
+### Accessing Variables
 variables can be accessed either directly by name or by parent linkage
 ```
 print(5_x) //prints 5
@@ -50,8 +50,8 @@ or
 ```
 print(x) //prints 10
 ```
-##Functions
-###Creating Functions
+## Functions
+### Creating Functions
 Functions are created using the `func` operator
 Parameters are specified using `(param1, param2, ...)`
 ```
@@ -69,7 +69,7 @@ func sumAndAvg(x,y) {
     return sum,result;
 }
 ```
-###Calling Functions
+### Calling Functions
 Functions are called using funcName(param1,param2,...)
 the return values are stored using the `->` operator
 ```
@@ -77,8 +77,8 @@ avg(x,y)->calcAverage;
 sumAndAvg(x,y)->calcSum,calcAverage;
 ```
 
-##Control Flow
-###if, elif, else
+## Control Flow
+### if, elif, else
 if is used as `if(boolean)`, elif is used as `elif(boolean)` and else use simply `else`
 ```
 >(x,y)->bool1;
@@ -91,7 +91,7 @@ if(bool1) {
     print("x and y are equal);
 }
 ```
-###while
+### while
 while loops are similarly formatted to if statments but use the `while` keyword
 ```
 =(0)->i;
@@ -106,14 +106,14 @@ Console output
 ```
 012345
 ```
-##Operators
+## Operators
 all operators in Forest act like function
-###1 Parameter operators (unary)
+### 1 Parameter operators (unary)
 ```
 ! //not
 = //equals (returns same value as parameter)
 ```
-###Variable Parameter operators
+### Variable Parameter operators
 these operators can take any number of parameters
 
 if the operator normally would take a specific number of parameter (for example > taking 2)
@@ -139,7 +139,7 @@ print(x); //prints 15
 *2$+(4,3,2,1)->;
 print(x); //prints 25
 ```
-##Comparators
+## Comparators
 In Forest, comparators act the same as operators
 
 If more than 2 parameters are given, the later parameters 
@@ -165,10 +165,10 @@ print(bool); //prints true
 >(3,5,2)->bool;
 print(bool); //prints false
 ```
-##Collections
+## Collections
 Forest does not currently support arrays or lists.
 Support for these will likely be added later once I better understand how to strucutre the language.
 
-##Built-in Functions
+## Built-in Functions
 Forest does not currently support any built-in functions other than `print`.
 Later on, it will likely include functions can get values and traverse the programs tree
