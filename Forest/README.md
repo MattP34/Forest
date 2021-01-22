@@ -17,9 +17,9 @@ Forest is a weakly typed language
 Supported data types include
 ```
 boolean
-int
-double
-char
+integer
+float
+character
 string
 ```
 ### Declaring Variables
@@ -92,7 +92,7 @@ if(bool1) {
 }
 ```
 ### while
-while loops are similarly formatted to if statments but use the `while` keyword
+while loops are similarly formatted to if statements but use the `while` keyword
 ```
 =(0)->i;
 <=(i,5)->bool;
@@ -109,22 +109,26 @@ Console output
 ## Operators
 all operators in Forest act like function
 ### 1 Parameter operators (unary)
-```
-! //not
-= //equals (returns same value as parameter)
-```
+
+| Operator  | Description |
+| ------------- | ------------- |
+| !  | not  |
+| =  | equals (returns same value as parameter)  |
+
 ### Variable Parameter operators
 these operators can take any number of parameters
 
 if the operator normally would take a specific number of parameter (for example > taking 2)
 Forest will continually apply the operator to the additional parameters given each new parameter and previous value
-```
-+ //addition
-- //subtraction
-* //multiplication
-/ //division
-** //power
-```
+
+| Operator  | Description |
+| ------------- | ------------- |
+| +  | addition  |
+| -  | subtraction  |
+| * | multiplication |
+| / | division |
+| ** | power |
+
 Operators can also be combined into a single function using the `$` symbol
 
 The first operator will always use the minimum parameters unless specified by following the operaotr with an integer
@@ -145,15 +149,16 @@ In Forest, comparators act the same as operators
 If more than 2 parameters are given, the later parameters 
 are compared the first parameter and `&&` are used between comparators
 the comparators in forest include
-```
-> //greater than
-< //less than
->= //greater than or equal to
-<= //less than or equal to
-== //equal to
-|| //or
-&& //and
-```
+
+| Operator  | Description |
+| ------------- | ------------- |
+| &gt; | greater than  |
+| <  | less than  |
+| >= | greater than or equal to |
+| <= | less than or equal to |
+| == | equals |
+| &#124;&#124; | or |
+| && | and|
 
 ```
 >(3,5)->bool;
@@ -166,8 +171,14 @@ print(bool); //prints true
 print(bool); //prints false
 ```
 ## Collections
-Forest does not currently support arrays or lists.
-Support for these will likely be added later once I better understand how to strucutre the language.
+Arrays are created as a child of the integer length node using the `[]` operator
+```
+[](10)->arr; //creates an array of size 10
+```
+Arrays elements are set or changing using the `->` operator at the index specified by `[index]`
+```
+=(5)->arr[0] //sets first element in the array arr to 5
+```
 
 ## Built-in Functions
 Forest does not currently support any built-in functions other than `print`.
