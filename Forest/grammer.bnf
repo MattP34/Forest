@@ -1,0 +1,70 @@
+#link to github https://github.com/MattP34/ProgrammingLanguages
+
+program ::= statement*
+
+statement ::= expression ";"
+            | instantiation ";"
+            | func_declaration ";"
+            | control_statement
+            | block ";"
+            | return_statement ";"
+
+expression ::= literal
+             | variable
+             | expression
+             | operator_list "(" expression_list ")"
+             | func_call
+
+expression_list ::= expression?
+             | expression + "," + expression_list
+
+instantiation ::= expression "->" variable_list
+
+func_declaration ::= "func" VARIABLE "(" parameter_list ")" block
+
+control_statement ::= while_loop
+                    | if_statement
+
+while_loop ::= "while" "(" expression ")" block
+
+if_statement ::= "if" "(" expression ")" block (elif_statement | else_statement)?
+
+elif_statement ::= "elif" "(" expression ")" block (elif_statement | else_statement)?
+
+else_statement ::= "else" block
+
+block ::= "{" statement* "}"
+
+return_statement ::= "return" expression_list
+
+parameter_list ::= VARIABLE + "," + parameter_list
+
+variable ::= VARIABLE
+           | VARIABLE "_" variable
+
+variable_list ::= variable?
+                | variable "," variable_list
+
+operator_list ::= operator
+                | operator Number? "$" operator_list
+
+operator ::= "!" | "=" | "[]" | "+" | "-" | "*" | "/" | "**" | ">" | "<" | ">=" | "<=" | "==" | "||" | "&&"
+
+
+func_call ::= VARIABLE "(" expression_list ")"
+
+literal ::= boolean
+          | integer
+          | float
+          | character
+          | string
+
+boolean ::= "true" | "false"
+
+integer ::= NUMBER
+
+float ::= NUMBER "." NUMBER?
+
+character ::= "\'" CHARACTER "\'"
+
+string ::= "\"" STRING "\""

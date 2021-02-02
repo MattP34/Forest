@@ -29,26 +29,24 @@ a child of a node is created using the `->` operator
 
 the child of a node can be accessed using the `_` operator
 
-the `=` sets a child node equal to the vlaue of the parent node
-
 variable values are stores by the most recent declaration but previous declaration can still be accessed through the graph
 ```
-=(5)->x;
+5->x;
 ```
 ### Changing Variables
 Variable values are stores by the most recent declaration but previous declaration can still be accessed through the graph
 ```
-=(10)->x;
+10->x;
 ```
 ### Accessing Variables
 variables can be accessed either directly by name or by parent linkage
 ```
-print(5_x) //prints 5
-print(10_x) //prints 10
+print(5_x); //prints 5
+print(10_x); //prints 10
 ```
 or
 ```
-print(x) //prints 10
+print(x); //prints 10
 ```
 ## Functions
 ### Creating Functions
@@ -59,7 +57,7 @@ func avg(x,y) {
     +(x,y)->sum;
     /(sum,2)->result;
     return result;
-}
+};
 ```
 Functions can also return multiple values
 ```
@@ -67,7 +65,7 @@ func sumAndAvg(x,y) {
     +(x,y)->sum;
     /(sum,2)->result;
     return sum,result;
-}
+};
 ```
 ### Calling Functions
 Functions are called using funcName(param1,param2,...)
@@ -89,18 +87,18 @@ if(bool1) {
     print("y is greater than x");
 } else {
     print("x and y are equal);
-}
+};
 ```
 ### while
 while loops are similarly formatted to if statements but use the `while` keyword
 ```
-=(0)->i;
+0->i;
 <=(i,5)->bool;
 while(bool) {
     +(i,1)->i;
     print(i);
     <=(i,5)->bool;
-}
+};
 ```
 Console output
 ```
@@ -114,6 +112,7 @@ all operators in Forest act like function
 | ------------- | ------------- |
 | !  | not  |
 | =  | equals (returns same value as parameter)  |
+| [] | creates array of given size |
 
 ### Variable Parameter operators
 these operators can take any number of parameters
@@ -131,7 +130,7 @@ Forest will continually apply the operator to the additional parameters given ea
 
 Operators can also be combined into a single function using the `$` symbol
 
-The first operator will always use the minimum parameters unless specified by following the operaotr with an integer
+The first operator will always use the minimum parameters unless specified by following the operator with an integer
 
 ```
 *$+(4,3,2)->x;
@@ -177,7 +176,7 @@ Arrays are created as a child of the integer length node using the `[]` operator
 ```
 Arrays elements are set or changing using the `->` operator at the index specified by `[index]`
 ```
-=(5)->arr[0] //sets first element in the array arr to 5
+5->arr(0) //sets first element in the array arr to 5
 ```
 
 ## Built-in Functions
