@@ -1,4 +1,4 @@
-#link to github https://github.com/MattP34/ProgrammingLanguages
+//link to github https://github.com/MattP34/ProgrammingLanguages
 
 program ::= statement*
 
