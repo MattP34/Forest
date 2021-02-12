@@ -8,7 +8,7 @@
     (* 3 (- 6 2) (- 2 7))))
 
 ; Exercise 1.3
-(define (squareOfLargerPair a b c) 
+define (squareOfLargerPair a b c) 
     (if (> a b) (+ (* a a) (* (max b c) (max b c)))
         (+ (* b b) (* (max a c) (max a c)))))
 (println (squareOfLargerPair 10 5 9))
