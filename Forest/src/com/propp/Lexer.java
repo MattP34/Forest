@@ -18,6 +18,8 @@ public class Lexer {
         keywords.put("if", TokenType.IF);
         keywords.put("elif", TokenType.ELIF);
         keywords.put("else", TokenType.ELSE);
+        keywords.put("true", TokenType.BOOLEAN);
+        keywords.put("false", TokenType.BOOLEAN);
     }
 
     private final String source;
@@ -211,6 +213,10 @@ public class Lexer {
         TokenType type = keywords.get(text);
         //if not, it is a user-defiend identifier
         if(type == null) return new Lexeme(TokenType.IDENTIFIER, text, this.lineNumber);
+        if(type == TokenType.BOOLEAN) {
+            if(text.equals("true")) return new Lexeme(type, true, this.lineNumber);
+            return new Lexeme(type, false, this.lineNumber);
+        }
         return new Lexeme(type, this.lineNumber);
     }
 }
