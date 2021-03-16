@@ -33,6 +33,7 @@ variable values are stores by the most recent declaration but previous declarati
 ```
 5->x;
 ```
+variable names must start with a letter and contain only numbers or letters
 ### Changing Variables
 Variable values are stores by the most recent declaration but previous declaration can still be accessed through the graph
 ```

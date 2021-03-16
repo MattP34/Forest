@@ -4,10 +4,9 @@ import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Forest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
         try {
             if(singlePathProvided(args)) runFile(args[0]);
             else {
@@ -15,7 +14,7 @@ public class Forest {
                 System.exit(64);
             }
         } catch(IOException e) {
-            System.out.println(e.toString());
+            throw new IOException(e.toString());
         }
     }
 
@@ -33,7 +32,7 @@ public class Forest {
         return new String(bytes, Charset.defaultCharset());
     }
 
-    public static void run(String sourceCode) {
+    public static void run(String sourceCode) throws IOException{
         Lexer lexer = new Lexer(sourceCode);
         ArrayList<Lexeme> lexemes = lexer.lex();
         printLexemes(lexemes);
@@ -41,5 +40,9 @@ public class Forest {
 
     private static void printLexemes(ArrayList<Lexeme> lexemes) {
         for(Lexeme lexeme: lexemes) System.out.println(lexeme.toString());
+    }
+
+    public static void error(int lineNumber, String msg) throws IOException {
+        throw new IOException("Syntax Erorr at line " + lineNumber + " " + msg);
     }
 }

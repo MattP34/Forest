@@ -10,16 +10,17 @@ public enum TokenType {
     COMMA,
     DOLLAR_SIGN,
 
-    //one or two character tokens
-    NOT, NOT_EQUAL,
-
-    //two character token
-    GREATER_THAN, LESS_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL, EQUALs,
-    OR, AND,
-
     PLUS,MINUS,TIMES,DIVIDE,POWER,
 
+    //one or two character tokens
+    NOT, NOT_EQUAL, ASSIGN, GREATER_THAN, LESS_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL, EQUALS,
+
+    //two character token
+    OR, AND,
+
     WHILE, IF, ELIF, ELSE,
+
+    FUNCTION_DECL, RETURN,
 
     STRING, CHARACTER, INTEGER, FLOAT, BOOLEAN,
 
