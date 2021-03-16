@@ -87,7 +87,7 @@ if(bool1) {
 } elif(bool2) {
     print("y is greater than x");
 } else {
-    print("x and y are equal);
+    print("x and y are equal");
 };
 ```
 ### while

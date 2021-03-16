@@ -35,10 +35,10 @@ public class Lexer {
         while(!isAtEnd()) {
             startOfCurrentLexeme = currentPosition;
             Lexeme nextLexeme = this.getNextLexeme();
-            if(nextLexeme != null) lexemes.add(nextLexeme);
+            if(nextLexeme != null) this.lexemes.add(nextLexeme);
         }
-        lexemes.add(new Lexeme(TokenType.FILE_END, this.lineNumber));
-        return new ArrayList<Lexeme>();//TODO
+        this.lexemes.add(new Lexeme(TokenType.FILE_END, this.lineNumber));
+        return this.lexemes;
     }
 
     private Lexeme getNextLexeme() throws IOException{
@@ -177,7 +177,13 @@ public class Lexer {
 
     private Lexeme lexString() throws IOException {
         while(!isAtEnd()) {
-            if(peek() == '"') return new Lexeme(TokenType.STRING, source.substring(this.startOfCurrentLexeme, this.currentPosition), this.lineNumber); 
+            char val = peek();
+            String test = val+" ";
+            if(peek() == '\"') {
+                advance();
+                return new Lexeme(TokenType.STRING, source.substring(this.startOfCurrentLexeme, this.currentPosition), this.lineNumber);
+            }
+            advance();
         }
         Forest.error(this.lineNumber, "No closing \"");
         return null;
@@ -185,11 +191,14 @@ public class Lexer {
 
     private Lexeme lexChar() throws IOException {
         if(peekNext() != '\'') Forest.error(this.lineNumber, "Missing closing '");
-        return new Lexeme(TokenType.CHARACTER, peek(), this.lineNumber);
+        char character = peek();
+        advance();
+        advance();
+        return new Lexeme(TokenType.CHARACTER, character, this.lineNumber);
     }
 
     private Lexeme lexComment() {
-        while(peek() != '\r' && peek() != '\n') {
+        while(peek() != '\r' && peek() != '\n' && !isAtEnd()) {
             advance();
         }
         return null;

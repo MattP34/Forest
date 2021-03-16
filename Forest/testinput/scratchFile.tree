@@ -1,0 +1,32 @@
+if(bool1) {
+    print("x is greater than y");
+} elif(bool2) {
+    print("y is greater than x");
+} else {
+    print('a');
+};
+0->i;
+<=(i,5)->bool;
+while(bool) {
+    +(i,1)->i;
+    print(i);
+    <=(i,5)->bool;
+};
+*$+(4,3,2)->x;
+print(x); //prints 14
+
+*$+(4,3,2,1)->x;
+print(x); //prints 15
+
+*2$+(4,3,2,1)->;
+print(x); //prints 25
+>(3,5)->bool;
+print(bool); //prints true
+
+>(3,5,6)->bool;
+print(bool); //prints true
+
+>(3,5,2)->bool;
+print(bool); //prints false
+[](10)->arr; //creates an array of size 10
+5->arr(0) //sets first element in the array arr to 5

@@ -8,6 +8,7 @@ public class Lexeme {
     private final Integer intValue;
     private final Double doubleValue;
     private final Boolean booleanValue;
+    private final Character characterValue;
 
     public Lexeme(TokenType type, int lineNumber) {
         this.type = type;
@@ -16,6 +17,7 @@ public class Lexeme {
         this.intValue = null;
         this.doubleValue = null;
         this.booleanValue = null;
+        this.characterValue = null;
     }
 
     public Lexeme(TokenType type, String stringValue, int lineNumber) {
@@ -25,6 +27,7 @@ public class Lexeme {
         this.intValue = null;
         this.doubleValue = null;
         this.booleanValue = null;
+        this.characterValue = null;
     }
 
     public Lexeme(TokenType type, int intValue, int lineNumber) {
@@ -34,6 +37,7 @@ public class Lexeme {
         this.stringValue = null;
         this.doubleValue = null;
         this.booleanValue = null;
+        this.characterValue = null;
     }
 
     public Lexeme(TokenType type, double doubleValue, int lineNumber) {
@@ -43,6 +47,7 @@ public class Lexeme {
         this.stringValue = null;
         this.intValue = null;
         this.booleanValue = null;
+        this.characterValue = null;
     }
 
     public Lexeme(TokenType type, boolean booleanValue, int lineNumber) {
@@ -52,6 +57,17 @@ public class Lexeme {
         this.stringValue = null;
         this.intValue = null;
         this.doubleValue = null;
+        this.characterValue = null;
+    }
+
+    public Lexeme(TokenType type, char characterValue, int lineNumber) {
+        this.type = type;
+        this.lineNumber = lineNumber;
+        this.booleanValue = null;
+        this.stringValue = null;
+        this.intValue = null;
+        this.doubleValue = null;
+        this.characterValue = Character.valueOf(characterValue);
     }
 
     public TokenType getType() {
@@ -68,6 +84,7 @@ public class Lexeme {
         if(this.intValue != null) str = this.intValue.toString();
         if(this.doubleValue != null) str = this.doubleValue.toString();
         if(this.booleanValue != null) str = this.booleanValue.toString();
+        if(this.characterValue != null) str = this.characterValue.toString();
         return this.type.toString() + ((str.length()>0)?":":"") + str + " [line " + lineNumber + "]";
     }
 }
