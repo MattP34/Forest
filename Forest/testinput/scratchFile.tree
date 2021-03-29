@@ -1,14 +1,8 @@
-() [] {}
-_,$
-+-*/**
-!!=->>>=<<===
-||&&
-while()if()elif()else
-func hi()
-    return "bye"
-"hello world"
-'a'
-25
-25.43
-true
-false
+0->i;
+<=(i,5)->bool;
+while(bool) {
+    +(i,1)->i;
+    print(i);
+    <=(i,5)->bool;
+    var[5][10][2];
+};

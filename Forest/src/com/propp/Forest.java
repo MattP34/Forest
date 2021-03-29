@@ -35,14 +35,26 @@ public class Forest {
     public static void run(String sourceCode) throws IOException{
         Lexer lexer = new Lexer(sourceCode);
         ArrayList<Lexeme> lexemes = lexer.lex();
-        printLexemes(lexemes);
+        for(Lexeme lex: lexemes) {
+            System.out.println(lex);
+        }
+        Recognizer rec = new Recognizer(lexemes);
+        rec.program();
     }
 
     private static void printLexemes(ArrayList<Lexeme> lexemes) {
         for(Lexeme lexeme: lexemes) System.out.println(lexeme.toString());
     }
 
-    public static void error(int lineNumber, String msg) throws IOException {
-        throw new IOException("Syntax Erorr at line " + lineNumber + " " + msg);
+    public static void error(int lineNumber, String msg) {
+        report(lineNumber, msg);
+    }
+
+    public static void error(Lexeme lexeme, String msg) {
+        error(lexeme.getLineNumber(), msg);
+    }
+
+    private static void report(int lineNumber, String msg) {
+        System.err.println("line:" + lineNumber + " " + msg);
     }
 }

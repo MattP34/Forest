@@ -177,7 +177,7 @@ Arrays are created as a child of the integer length node using the `[]` operator
 ```
 Arrays elements are set or changing using the `->` operator at the index specified by `[index]`
 ```
-5->arr(0) //sets first element in the array arr to 5
+5->arr[0] //sets first element in the array arr to 5
 ```
 
 ## Built-in Functions

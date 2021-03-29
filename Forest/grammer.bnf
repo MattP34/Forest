@@ -9,16 +9,17 @@ statement ::= expression ";"
             | block ";"
             | return_statement ";"
 
-expression ::= literal
-             | variable
-             | expression
+expression ::= primary
              | operator_list "(" expression_list ")"
              | binary_operator "(" expression ")"
              | func_call
 
-expression_list ::= expression ("," + expression_list)?
+primary ::= variable | literal
 
-instantiation ::= expression "->" variable_tree
+expression_list ::= expression ("," + expression_list)?
+                    |
+
+instantiation ::= expression "->" IDENTIFIER
 
 func_declaration ::= "func" INDENTIFIER "(" parameter_list ")" block
 
@@ -37,16 +38,15 @@ block ::= "{" statement* "}"
 
 return_statement ::= "return" expression_list
 
-parameter_list ::= INDENTIFIER + "," + parameter_list
+parameter_list ::= INDENTIFIER + ("," + parameter_list)?
 
 variable ::= INDENTIFIER ("_" variable)?
 
-variable_tree ::= variable (variable "," variable_tree)?
+array_access ::= variable ("[" expression "]")+
 
-operator_list ::= variadic_operator
-                | operator NUMBER? "$" operator_list
+operator_list ::= variadic_operator (INTEGER? "$" operator_list)?
 
-variadic_operator ::= comparator | math_operator | boolean_operator | "[]"
+variadic_operator ::= comparator | math_operator | boolean_operator | "[" "]"
 
 comparator ::=  ">" | "<" | ">=" | "<=" | "=="
 
@@ -56,20 +56,10 @@ boolean_operator ::= "||" | "&&"
 
 binary_operator ::= "!" | "=" | "-"
 
-func_call ::= INDENTIFIER "(" expression_list ")"
+func_call ::= IDENTIFIER "(" expression_list ")"
 
-literal ::= boolean
-          | integer
-          | float
-          | character
-          | string
-
-boolean ::= "true" | "false"
-
-integer ::= "-"? NUMBER
-
-float ::= "-"? NUMBER "." NUMBER?
-
-character ::= "\'" CHARACTER "\'"
-
-string ::= "\"" STRING "\""
+literal ::= BOOLEAN
+          | INTEGER
+          | FLOAT
+          | CHARACTER
+          | STRING

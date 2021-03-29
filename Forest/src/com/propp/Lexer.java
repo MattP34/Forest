@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.propp.TokenType;
+import static com.propp.TokenType.*;
 
 public class Lexer {
     private static final HashMap<String, TokenType> keywords;
 
     static {
         keywords = new HashMap<String, TokenType>();
-        keywords.put("func", TokenType.FUNCTION_DECL);
-        keywords.put("return", TokenType.RETURN);
+        keywords.put("func", FUNCTION_DECL);
+        keywords.put("return", RETURN);
 
-        keywords.put("while", TokenType.WHILE);
-        keywords.put("if", TokenType.IF);
-        keywords.put("elif", TokenType.ELIF);
-        keywords.put("else", TokenType.ELSE);
-        keywords.put("true", TokenType.BOOLEAN);
-        keywords.put("false", TokenType.BOOLEAN);
+        keywords.put("while", WHILE);
+        keywords.put("if", IF);
+        keywords.put("elif", ELIF);
+        keywords.put("else", ELSE);
+        keywords.put("true", BOOLEAN);
+        keywords.put("false", BOOLEAN);
     }
 
     private final String source;
@@ -39,7 +39,7 @@ public class Lexer {
             Lexeme nextLexeme = this.getNextLexeme();
             if(nextLexeme != null) this.lexemes.add(nextLexeme);
         }
-        this.lexemes.add(new Lexeme(TokenType.FILE_END, this.lineNumber));
+        this.lexemes.add(new Lexeme(FILE_END, this.lineNumber));
         return this.lexemes;
     }
 
@@ -54,50 +54,50 @@ public class Lexer {
                 return null;
             //single character tokens
             case '(':
-                return new Lexeme(TokenType.O_OPREN, this.lineNumber);
+                return new Lexeme(O_OPREN, this.lineNumber);
             case ')':
-                return new Lexeme(TokenType.C_OPREN, this.lineNumber);
+                return new Lexeme(C_OPREN, this.lineNumber);
             case '{':
-                return new Lexeme(TokenType.O_CURLY, this.lineNumber);
+                return new Lexeme(O_CURLY, this.lineNumber);
             case '}':
-                return new Lexeme(TokenType.C_CURLY, this.lineNumber);
+                return new Lexeme(C_CURLY, this.lineNumber);
             case '[':
-                return new Lexeme(TokenType.O_SQUARE, this.lineNumber);
+                return new Lexeme(O_SQUARE, this.lineNumber);
             case ']':
-                return new Lexeme(TokenType.C_SQUARE, this.lineNumber);
+                return new Lexeme(C_SQUARE, this.lineNumber);
             case '_':
-                return new Lexeme(TokenType.UNDERSCORE, this.lineNumber);
+                return new Lexeme(UNDERSCORE, this.lineNumber);
             case ',':
-                return new Lexeme(TokenType.COMMA, this.lineNumber);
+                return new Lexeme(COMMA, this.lineNumber);
             case '$':
-                return new Lexeme(TokenType.DOLLAR_SIGN, this.lineNumber);
+                return new Lexeme(DOLLAR_SIGN, this.lineNumber);
             case '+':
-                return new Lexeme(TokenType.PLUS, this.lineNumber);
+                return new Lexeme(PLUS, this.lineNumber);
             case ';':
-                return new Lexeme(TokenType.SEMICOLON, this.lineNumber);
+                return new Lexeme(SEMICOLON, this.lineNumber);
             //one or two character tokens
             case '-':
-                return new Lexeme(match('>') ? TokenType.ASSIGN : TokenType.MINUS, this.lineNumber); //check
+                return new Lexeme(match('>') ? ASSIGN : MINUS, this.lineNumber); //check
             case '*':
-                return new Lexeme(match('*') ? TokenType.POWER : TokenType.TIMES, this.lineNumber);
+                return new Lexeme(match('*') ? POWER : TIMES, this.lineNumber);
             case '/':
                 if(match('/')) return lexComment();
-                return new Lexeme(TokenType.DIVIDE, this.lineNumber);
+                return new Lexeme(DIVIDE, this.lineNumber);
             case '!':
-                return new Lexeme(match('=') ? TokenType.NOT_EQUAL : TokenType.NOT, this.lineNumber);
+                return new Lexeme(match('=') ? NOT_EQUAL : NOT, this.lineNumber);
             case '>':
-                return new Lexeme(match('=') ? TokenType.GREATER_THAN_OR_EQUAL : TokenType.GREATER_THAN, this.lineNumber);
+                return new Lexeme(match('=') ? GREATER_THAN_OR_EQUAL : GREATER_THAN, this.lineNumber);
             case '<':
-                return new Lexeme(match('=') ? TokenType.LESS_THAN_OR_EQUAL : TokenType.LESS_THAN, this.lineNumber);
+                return new Lexeme(match('=') ? LESS_THAN_OR_EQUAL : LESS_THAN, this.lineNumber);
             //two character tokens
             case '=':
-                if(match('=')) return new Lexeme(TokenType.EQUALS, this.lineNumber);
-                Forest.error(this.lineNumber, "Missing second '='");
+                if(match('=')) return new Lexeme(EQUALS, this.lineNumber);
+                return new Lexeme(EQUAL, this.lineNumber);
             case '|':
-                if(match('|')) return new Lexeme(TokenType.OR, this.lineNumber);
+                if(match('|')) return new Lexeme(OR, this.lineNumber);
                 Forest.error(this.lineNumber, "Missing second '|'");
             case '&':
-                if(match('&')) return new Lexeme(TokenType.AND, this.lineNumber);
+                if(match('&')) return new Lexeme(AND, this.lineNumber);
                 Forest.error(this.lineNumber, "Missing second '&'");
             case '"':
                 return lexString();
@@ -171,10 +171,10 @@ public class Lexer {
         String numberString = source.substring(this.startOfCurrentLexeme, this.currentPosition);
         if(isInteger) {
             int number = Integer.parseInt(numberString);
-            return new Lexeme(TokenType.INTEGER, number, this.lineNumber);
+            return new Lexeme(INTEGER, number, this.lineNumber);
         }
         double number = Double.parseDouble(numberString);
-        return new Lexeme(TokenType.FLOAT, number, this.lineNumber);
+        return new Lexeme(FLOAT, number, this.lineNumber);
     }
 
     private Lexeme lexString() throws IOException {
@@ -183,7 +183,7 @@ public class Lexer {
             String test = val+" ";
             if(peek() == '\"') {
                 advance();
-                return new Lexeme(TokenType.STRING, source.substring(this.startOfCurrentLexeme, this.currentPosition), this.lineNumber);
+                return new Lexeme(STRING, source.substring(this.startOfCurrentLexeme, this.currentPosition), this.lineNumber);
             }
             advance();
         }
@@ -196,11 +196,11 @@ public class Lexer {
         char character = peek();
         advance();
         advance();
-        return new Lexeme(TokenType.CHARACTER, character, this.lineNumber);
+        return new Lexeme(CHARACTER, character, this.lineNumber);
     }
 
     private Lexeme lexComment() {
-        while(peek() != '\r' && peek() != '\n' && !isAtEnd()) {
+        while (peek() != '\r' && peek() != '\n' && !isAtEnd()) {
             advance();
         }
         return null;
@@ -212,8 +212,8 @@ public class Lexer {
         //see if the suspected identifier is actually a keyword
         TokenType type = keywords.get(text);
         //if not, it is a user-defiend identifier
-        if(type == null) return new Lexeme(TokenType.IDENTIFIER, text, this.lineNumber);
-        if(type == TokenType.BOOLEAN) {
+        if(type == null) return new Lexeme(IDENTIFIER, text, this.lineNumber);
+        if(type == BOOLEAN) {
             if(text.equals("true")) return new Lexeme(type, true, this.lineNumber);
             return new Lexeme(type, false, this.lineNumber);
         }
