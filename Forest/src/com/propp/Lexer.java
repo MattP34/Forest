@@ -33,19 +33,19 @@ public class Lexer {
         this.lineNumber = 1;
     }
 
-    public ArrayList<Lexeme> lex() throws IOException{
-        while(!isAtEnd()) {
+    public ArrayList<Lexeme> lex() throws IOException {
+        while (!isAtEnd()) {
             startOfCurrentLexeme = currentPosition;
             Lexeme nextLexeme = this.getNextLexeme();
-            if(nextLexeme != null) this.lexemes.add(nextLexeme);
+            if (nextLexeme != null) this.lexemes.add(nextLexeme);
         }
         this.lexemes.add(new Lexeme(FILE_END, this.lineNumber));
         return this.lexemes;
     }
 
-    private Lexeme getNextLexeme() throws IOException{
+    private Lexeme getNextLexeme() throws IOException {
         char c = this.advance();
-        switch(c) {
+        switch (c) {
             //ignore whitespace
             case ' ':
             case '\t':
@@ -62,6 +62,7 @@ public class Lexer {
             case '}':
                 return new Lexeme(C_CURLY, this.lineNumber);
             case '[':
+                if (match(']')) return new Lexeme(ARRAY_CREATION, this.lineNumber);
                 return new Lexeme(O_SQUARE, this.lineNumber);
             case ']':
                 return new Lexeme(C_SQUARE, this.lineNumber);
@@ -81,7 +82,7 @@ public class Lexer {
             case '*':
                 return new Lexeme(match('*') ? POWER : TIMES, this.lineNumber);
             case '/':
-                if(match('/')) return lexComment();
+                if (match('/')) return lexComment();
                 return new Lexeme(DIVIDE, this.lineNumber);
             case '!':
                 return new Lexeme(match('=') ? NOT_EQUAL : NOT, this.lineNumber);
@@ -91,21 +92,21 @@ public class Lexer {
                 return new Lexeme(match('=') ? LESS_THAN_OR_EQUAL : LESS_THAN, this.lineNumber);
             //two character tokens
             case '=':
-                if(match('=')) return new Lexeme(EQUALS, this.lineNumber);
+                if (match('=')) return new Lexeme(EQUALS, this.lineNumber);
                 return new Lexeme(EQUAL, this.lineNumber);
             case '|':
-                if(match('|')) return new Lexeme(OR, this.lineNumber);
+                if (match('|')) return new Lexeme(OR, this.lineNumber);
                 Forest.error(this.lineNumber, "Missing second '|'");
             case '&':
-                if(match('&')) return new Lexeme(AND, this.lineNumber);
+                if (match('&')) return new Lexeme(AND, this.lineNumber);
                 Forest.error(this.lineNumber, "Missing second '&'");
             case '"':
                 return lexString();
             case '\'':
                 return lexChar();
             default:
-                if(isDigit(c)) return lexNumber();
-                if(isAlpha(c)) return lexIdentifierOrKeyword();
+                if (isDigit(c)) return lexNumber();
+                if (isAlpha(c)) return lexIdentifierOrKeyword();
                 Forest.error(this.lineNumber, "Unexpected character: " + c);
 
         }
@@ -113,24 +114,24 @@ public class Lexer {
     }
 
     private char peek() {
-        if(this.isAtEnd()) return '\0';
+        if (this.isAtEnd()) return '\0';
         return source.charAt(currentPosition);
     } //checks the next character to see if its the end of the file, and if not returns the character
 
     private char peekNext() {
-        if(currentPosition + 1 >= source.length()) return '\0';
+        if (currentPosition + 1 >= source.length()) return '\0';
         return source.charAt(currentPosition + 1);
-    } 
+    }
 
     private boolean match(char expected) {
-        if(isAtEnd() || source.charAt(currentPosition) != expected) return false;
+        if (isAtEnd() || source.charAt(currentPosition) != expected) return false;
         currentPosition++;
         return true;
     }
 
     private char advance() {
         char currentChar = source.charAt(currentPosition);
-        if(currentChar == '\n' || currentChar == '\r') lineNumber++;
+        if (currentChar == '\n' || currentChar == '\r') lineNumber++;
         currentPosition++;
         return currentChar;
     }
@@ -154,22 +155,22 @@ public class Lexer {
 
     private Lexeme lexNumber() throws IOException {
         boolean isInteger = true;
-        while(isDigit(peek())) {
+        while (isDigit(peek())) {
             advance();
         }
         //look for fractional part
-        if(peek() == '.') {
+        if (peek() == '.') {
             //ensure there is digit following the decimal point
-            if(!isDigit(peekNext())) Forest.error(this.lineNumber, "Malformed real number (ends in decimal point).");
+            if (!isDigit(peekNext())) Forest.error(this.lineNumber, "Malformed real number (ends in decimal point).");
             isInteger = false;
             // Consume the .
             advance();
-            while(isDigit(peek())) {
+            while (isDigit(peek())) {
                 advance();
             }
         }
         String numberString = source.substring(this.startOfCurrentLexeme, this.currentPosition);
-        if(isInteger) {
+        if (isInteger) {
             int number = Integer.parseInt(numberString);
             return new Lexeme(INTEGER, number, this.lineNumber);
         }
@@ -178,10 +179,10 @@ public class Lexer {
     }
 
     private Lexeme lexString() throws IOException {
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             char val = peek();
-            String test = val+" ";
-            if(peek() == '\"') {
+            String test = val + " ";
+            if (peek() == '\"') {
                 advance();
                 return new Lexeme(STRING, source.substring(this.startOfCurrentLexeme, this.currentPosition), this.lineNumber);
             }
@@ -192,7 +193,7 @@ public class Lexer {
     }
 
     private Lexeme lexChar() throws IOException {
-        if(peekNext() != '\'') Forest.error(this.lineNumber, "Missing closing '");
+        if (peekNext() != '\'') Forest.error(this.lineNumber, "Missing closing '");
         char character = peek();
         advance();
         advance();
@@ -212,9 +213,9 @@ public class Lexer {
         //see if the suspected identifier is actually a keyword
         TokenType type = keywords.get(text);
         //if not, it is a user-defiend identifier
-        if(type == null) return new Lexeme(IDENTIFIER, text, this.lineNumber);
-        if(type == BOOLEAN) {
-            if(text.equals("true")) return new Lexeme(type, true, this.lineNumber);
+        if (type == null) return new Lexeme(IDENTIFIER, text, this.lineNumber);
+        if (type == BOOLEAN) {
+            if (text.equals("true")) return new Lexeme(type, true, this.lineNumber);
             return new Lexeme(type, false, this.lineNumber);
         }
         return new Lexeme(type, this.lineNumber);

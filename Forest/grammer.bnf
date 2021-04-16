@@ -11,7 +11,7 @@ statement ::= expression ";"
 
 expression ::= primary
              | operator_list "(" expression_list ")"
-             | binary_operator "(" expression ")"
+             | unary_operator "(" expression ")"
              | func_call
 
 primary ::= variable | literal
@@ -46,7 +46,9 @@ array_access ::= variable ("[" expression "]")+
 
 operator_list ::= variadic_operator (INTEGER? "$" operator_list)?
 
-variadic_operator ::= comparator | math_operator | boolean_operator | "[" "]"
+variadic_operator ::= comparator | math_operator | boolean_operator | array_creation
+
+array_creation ::= "[" "]"
 
 comparator ::=  ">" | "<" | ">=" | "<=" | "=="
 
@@ -54,7 +56,7 @@ math_operator ::= "+" | "-" | "*" | "/" | "**"
 
 boolean_operator ::= "||" | "&&"
 
-binary_operator ::= "!" | "=" | "-"
+unary_operator ::= "!" | "=" | "-"
 
 func_call ::= IDENTIFIER "(" expression_list ")"
 

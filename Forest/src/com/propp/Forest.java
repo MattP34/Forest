@@ -1,19 +1,20 @@
 package com.propp;
+
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Forest {
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         try {
-            if(singlePathProvided(args)) runFile(args[0]);
+            if (singlePathProvided(args)) runFile(args[0]);
             else {
                 System.out.println(("Usage: forest [path to .tree file]"));
                 System.exit(64);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new IOException(e.toString());
         }
     }
@@ -32,18 +33,19 @@ public class Forest {
         return new String(bytes, Charset.defaultCharset());
     }
 
-    public static void run(String sourceCode) throws IOException{
+    public static void run(String sourceCode) throws IOException {
         Lexer lexer = new Lexer(sourceCode);
         ArrayList<Lexeme> lexemes = lexer.lex();
-        for(Lexeme lex: lexemes) {
+        for (Lexeme lex : lexemes) {
             System.out.println(lex);
         }
-        Recognizer rec = new Recognizer(lexemes);
-        rec.program();
+        Parser rec = new Parser(lexemes);
+        Lexeme root = rec.program();
+        Parser.printTree(root);
     }
 
     private static void printLexemes(ArrayList<Lexeme> lexemes) {
-        for(Lexeme lexeme: lexemes) System.out.println(lexeme.toString());
+        for (Lexeme lexeme : lexemes) System.out.println(lexeme.toString());
     }
 
     public static void error(int lineNumber, String msg) {

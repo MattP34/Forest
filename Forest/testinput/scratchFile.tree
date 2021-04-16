@@ -1,4 +1,5 @@
 0->i;
+!(false);
 <=(i,5)->bool;
 while(bool) {
     +(i,1)->i;
