@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Forest {
     public static void main(String[] args) throws IOException {
@@ -36,12 +37,14 @@ public class Forest {
     public static void run(String sourceCode) throws IOException {
         Lexer lexer = new Lexer(sourceCode);
         ArrayList<Lexeme> lexemes = lexer.lex();
-        for (Lexeme lex : lexemes) {
-            System.out.println(lex);
-        }
         Parser rec = new Parser(lexemes);
         Lexeme root = rec.program();
         Parser.printTree(root);
+        Evaluator evaluator = new Evaluator();
+        List<Lexeme> output = evaluator.eval(root, new Environment(null));
+        for (Lexeme lex : output) {
+            System.out.println(lex.getValueString());
+        }
     }
 
     private static void printLexemes(ArrayList<Lexeme> lexemes) {

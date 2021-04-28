@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import static com.propp.TokenType.*;
 
 public class Parser {
-    private static final boolean debug = true;
+    private static final boolean debug = false;
 
     private ArrayList<Lexeme> lexemes;
     private int nextLexemeIndex;
@@ -178,6 +178,7 @@ public class Parser {
 
     private Lexeme parameterList() {
         if (debug) System.out.println("-- parameter list --");
+        if (!check(IDENTIFIER)) return null;
         Lexeme lex = consume(IDENTIFIER);
         Lexeme root = new Lexeme(PARAMETER_LIST, lex.getLineNumber());
         root.setLeft(lex);
@@ -226,7 +227,7 @@ public class Parser {
         Lexeme root = new Lexeme(FUNC_CALL, identifier.getLineNumber());
         root.setLeft(identifier);
         consume(O_OPREN);
-        root.setRight(expressionList());
+        root.getLeft().setLeft(expressionList());
         consume(C_OPREN);
         return root;
     }
@@ -287,15 +288,17 @@ public class Parser {
         Lexeme op = variadicOperator();
         Lexeme root = new Lexeme(OPERATOR_LIST, op.getLineNumber());
         root.setLeft(op);
-        if (!((check(INTEGER) || check(DOLLAR_SIGN)))) {
-            return op;
-        }
         root.setRight(new Lexeme(GLUE, op.getLineNumber()));
+        if (!((check(INTEGER) || check(DOLLAR_SIGN)))) {
+            return root;
+        }
         if (check(INTEGER)) {
             root.getRight().setRight(consume(INTEGER));
         }
-        consume(DOLLAR_SIGN);
-        root.getRight().setLeft(operatorList());
+        if (check(DOLLAR_SIGN)) {
+            consume(DOLLAR_SIGN);
+            root.getRight().setLeft(operatorList());
+        }
         return root;
     }
 

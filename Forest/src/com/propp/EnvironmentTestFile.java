@@ -12,5 +12,6 @@ public class EnvironmentTestFile {
         System.out.println(func1.getVariableValue(new Lexeme(IDENTIFIER, "x", 1)));
         System.out.println(global.getVariableValue(new Lexeme(IDENTIFIER, "x", 1)));
         System.out.println(global.getVariableValue(new Lexeme(IDENTIFIER, "y", 2)));
+        System.out.println(func1.variableExists(new Lexeme(IDENTIFIER, "y", 2)));
     }
 }

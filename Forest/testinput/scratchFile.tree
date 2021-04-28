@@ -1,9 +1,6 @@
-0->i;
-!(false);
-<=(i,5)->bool;
-while(bool) {
-    +(i,1)->i;
-    print(i);
-    <=(i,5)->bool;
-    var[5][10][2];
+func addThenMutliple(x,y,z) {
+    return +$*(x,y,z);
 };
+
+10->x;
+addThenMutliple(5,addThenMutliple(1,2,3),2);

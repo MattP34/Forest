@@ -1,5 +1,7 @@
 package com.propp;
 
+import static com.propp.TokenType.PARAMETER_LIST;
+
 public class Lexeme {
     private final TokenType type;
     private final int lineNumber;
@@ -107,6 +109,16 @@ public class Lexeme {
         return this.lineNumber;
     }
 
+    public String getValueString() {
+        String str = "";
+        if (this.stringValue != null) str = this.stringValue;
+        if (this.intValue != null) str = this.intValue.toString();
+        if (this.doubleValue != null) str = this.doubleValue.toString();
+        if (this.booleanValue != null) str = this.booleanValue.toString();
+        if (this.characterValue != null) str = this.characterValue.toString();
+        return str;
+    }
+
     public String toString() {
         String str = "";
         if (this.stringValue != null) str = this.stringValue;
@@ -117,16 +129,27 @@ public class Lexeme {
         return this.type.toString() + ((str.length() > 0) ? ":" : "") + str + " [line " + lineNumber + "]";
     }
 
+    public int getParamExpresListLength() {
+        if (this.type != PARAMETER_LIST && this.type != PARAMETER_LIST) return 0;
+        Lexeme node = this;
+        int counter = 0;
+        while (node != null) {
+            counter++;
+            node = this.getRight();
+        }
+        return counter;
+    }
+
     @Override
     public int hashCode() { //TODO fix
         if (this.stringValue == null) return 1;
-        return (this.type.toString() + this.stringValue).hashCode();
+        return (this.stringValue).hashCode() + getParamExpresListLength();
     }
 
     @Override
     public boolean equals(Object o) {
         if (o.getClass() != Lexeme.class) return false;
         Lexeme lex = (Lexeme) o;
-        return lex.type == this.type && lex.stringValue.equals(this.stringValue);
+        return lex.type == this.type && lex.stringValue.equals(this.stringValue) && this.getParamExpresListLength() == ((Lexeme) o).getParamExpresListLength();
     }
 }
