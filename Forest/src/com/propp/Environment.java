@@ -14,7 +14,11 @@ public class Environment {
 
     //not instatation, modifying and creating are the same statement so 1 method for both
     public void addVariable(Lexeme identifier, Lexeme value) {
-        variables.put(identifier, value);
+        if (!variableExists(identifier) || variables.containsKey(identifier)) {
+            variables.put(identifier, value);
+        } else {
+            this.parent.addVariable(identifier, value);
+        }
     }
 
     public boolean variableExists(Lexeme identifier) {

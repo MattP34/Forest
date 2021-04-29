@@ -37,6 +37,9 @@ public class Forest {
     public static void run(String sourceCode) throws IOException {
         Lexer lexer = new Lexer(sourceCode);
         ArrayList<Lexeme> lexemes = lexer.lex();
+        for (Lexeme lex : lexemes) {
+            System.out.println(lex);
+        }
         Parser rec = new Parser(lexemes);
         Lexeme root = rec.program();
         Parser.printTree(root);

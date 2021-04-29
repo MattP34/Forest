@@ -53,14 +53,7 @@ graph
 
 ### Accessing Variables
 
-variables can be accessed either directly by name or by parent linkage
-
-```
-print(5_x); //prints 5
-print(10_x); //prints 10
-```
-
-or
+variables can be accessed by name (access by parent variable is not yet implemented)
 
 ```
 print(x); //prints 10
@@ -165,7 +158,6 @@ Forest will continually apply the operator to the additional parameters given ea
 | -  | subtraction  |
 | * | multiplication |
 | / | division |
-| ** | power |
 
 Operators can also be combined into a single function using the `$` symbol
 
@@ -222,6 +214,13 @@ Arrays elements are set or changing using the `->` operator at the index specifi
 
 ```
 5->arr[0] //sets first element in the array arr to 5
+```
+
+Forest does support multidimensional arrays
+
+```
+[](10,10)->arr; // creates an array of size 10x10
+5->arr[0][0]; //sets first element in the array arr to 5
 ```
 
 ## Built-in Functions

@@ -33,21 +33,18 @@ public class Evaluator {
             case VARIADIC_OPERATION:
                 return variadicOperation(tree, environment, null);
             case UNARY_OPERATION:
-                break; //TODO
+                return evalUnaryOperation(tree, environment);
             case ARRAY_ACCESS:
-                break; //TODO
+                return arrayAccess(tree, environment);
             case VARIABLE:
                 return evalVariable(tree, environment);
             case ASSIGN:
                 return assignVariable(tree, environment);
-            case ARRAY_CREATION:
-                break; //TODO
             case IF:
-                break; //TODO
             case ELIF:
-                break; //TODO
+                return evalIf(tree, environment);
             case ELSE:
-                break; //TODO
+                return evalElse(tree, environment);
             case WHILE:
                 return evalWhile(tree, environment);
             case INTEGER:
@@ -79,13 +76,21 @@ public class Evaluator {
     }
 
     private List<Lexeme> functionDeclaration(Lexeme root, Environment environment) {
+        if (root.getLeft().stringValue.equals("print")) {
+            Forest.error(root.getLineNumber(), " can not declare function with name print");
+            return null;
+        }
         environment.addVariable(root.getLeft(), root.getRight());
         return createSingleList(root.getRight());
     }
 
     private List<Lexeme> functionCall(Lexeme root, Environment environment) {
+        if (root.getLeft().stringValue.equals("print")) {
+            print(root.getLeft().getLeft(), environment);
+            return null;
+        }
         if (!environment.variableExists(root.getLeft())) {
-            Forest.error(root.getLineNumber(), "function: " + root.getLeft().stringValue + " not declared");
+            Forest.error(root.getLineNumber(), "function " + root.getLeft().stringValue + " not declared");
             return null;
         }
         Lexeme statementList = environment.getVariableValue(root.getLeft());
@@ -115,16 +120,42 @@ public class Evaluator {
         return temp;
     }
 
+    private void print(Lexeme root, Environment environment) {
+        String str = "";
+        List<Lexeme> expressionList = eval(root, environment);
+        for (int i = 0; i < expressionList.size(); i++) {
+            if (expressionList.get(i) == null) return;
+            switch (expressionList.get(i).getType()) {
+                case INTEGER:
+                    str += expressionList.get(i).intValue;
+                    break;
+                case FLOAT:
+                    str += expressionList.get(i).doubleValue;
+                    break;
+                case STRING:
+                    str += expressionList.get(i).stringValue;
+                    break;
+                case BOOLEAN:
+                    str += expressionList.get(i).booleanValue;
+                    break;
+                case CHARACTER:
+                    str += expressionList.get(i).characterValue;
+                    break;
+                default:
+                    Forest.error(root.getLineNumber(), "unsupported type " + expressionList.get(i).getType() + "for print statement");
+            }
+            if (i < expressionList.size() - 1) {
+                str += ",";
+            }
+        }
+        System.out.println(str);
+    }
+
     private List<Lexeme> evalStatementList(Lexeme statementList, Environment environment) {
         if (statementList == null) return null;
         if (statementList.getLeft() == null) return null;
         if (statementList.getLeft().getType() == RETURN) {
-            if (this.functionCounter == 0) {
-                Forest.error(statementList.getLeft().getLineNumber(), " return statement outside of function");
-            }
-            List<Lexeme> temp = eval(statementList.getLeft(), environment);
-            returning = true;
-            return temp;
+            return eval(statementList.getLeft(), environment); //evaluating return function
         }
         List<Lexeme> temp = eval(statementList.getLeft(), environment);
         if (returning) return temp;
@@ -132,7 +163,12 @@ public class Evaluator {
     }
 
     private List<Lexeme> evalReturnStatement(Lexeme root, Environment environment) {
-        return eval(root.getLeft(), environment);
+        if (this.functionCounter == 0) {
+            Forest.error(root.getLineNumber(), " return statement outside of a function");
+        }
+        List<Lexeme> temp = eval(root.getLeft(), environment);
+        this.returning = true;
+        return temp;
     }
 
     private List<Lexeme> evalExpressionList(Lexeme root, Environment environment) {
@@ -152,16 +188,111 @@ public class Evaluator {
 
     private List<Lexeme> assignVariable(Lexeme root, Environment environment) {
         List<Lexeme> expressionVals = eval(root.getRight(), environment);
-        if (expressionVals.size() == 0) {
-            Forest.error(root.getLineNumber(), " missing expression for assignment");
+        Lexeme variableListNode = root.getLeft();
+        List<Lexeme> variables = new ArrayList<Lexeme>();
+        while (variableListNode != null) {
+            if (variableListNode.getLeft() != null) variables.add(variableListNode.getLeft());
+            variableListNode = variableListNode.getRight();
         }
-        environment.addVariable(root.getLeft(), expressionVals.get(0));
-        return createSingleList(root.getLeft());
+        if (expressionVals.size() != variables.size()) {
+            Forest.error(root.getLineNumber(), " mismatching number of expressions and variables. Expressions:" + expressionVals.size() + " Variables:" + variables.size());
+            return null;
+        }
+        for (int i = 0; i < variables.size(); i++) {
+            if (variables.get(i).getLeft() != null) {
+                Lexeme identifier = variables.get(i);
+                Lexeme temp = identifier.getLeft();
+                if (temp.getType() != INTEGER) {
+                    Forest.error(temp.getLineNumber(), "expected Integer for array location found " + variables.get(i).getLeft().getType());
+                    return null;
+                }
+                if (!environment.variableExists(identifier)) {
+                    Forest.error(identifier.getLineNumber(), "array not instatiated");
+                    return null;
+                }
+                Lexeme array = environment.getVariableValue(identifier);
+                while (temp != null) {
+                    if (array.getType() != ARRAY) {
+                        Forest.error(identifier.getLineNumber(), identifier.stringValue + " is not an array of required dimension");
+                    }
+                    if (temp.getLeft() == null) {//no more dimensions of the array
+                        if (array.arrayValue.length <= temp.intValue) {
+                            Forest.error(identifier.getLineNumber(), "Array index out of bounds. Length:" + array.arrayValue.length + " Value:" + temp.intValue);
+                            return null;
+                        }
+                        array.arrayValue[temp.intValue] = expressionVals.get(i);
+                    } else {
+                        array = array.arrayValue[temp.intValue];
+                    }
+                    temp = temp.getLeft();
+                }
+            } else {
+                environment.addVariable(variables.get(i), expressionVals.get(i));
+            }
+        }
+        return null;
+    }
+
+    private List<Lexeme> arrayAccess(Lexeme root, Environment environment) {
+        List<Lexeme> array = eval(root.getLeft(), environment);
+        if (array.size() != 1) {
+            Forest.error(root.getLineNumber(), "not single variable for array");
+            return null;
+        }
+        Lexeme arr = array.get(0);
+        Lexeme temp = root.getRight();
+        while (temp != null) {
+            if (arr.getType() != ARRAY) {
+                Forest.error(root.getLineNumber(), "not enough dimensions for array");
+                return null;
+            }
+            if (temp.getLeft() == null || temp.getLeft().getType() != INTEGER) {
+                Forest.error(root.getLineNumber(), "must have integer position for array");
+                return null;
+            }
+            if (arr.arrayValue.length <= temp.getLeft().intValue) {
+                Forest.error(root.getLineNumber(), "Array index out of bounds. Length:" + arr.arrayValue.length + " Value:" + temp.getLeft().intValue);
+                return null;
+            }
+            arr = arr.arrayValue[temp.getLeft().intValue];
+            temp = temp.getRight();
+        }
+        return createSingleList(arr);
     }
 
     private List<Lexeme> evalWhile(Lexeme root, Environment environment) {
         Environment loopEnvir = new Environment(environment);
-        while (eval(root.getLeft(), environment)
+        while (checkIfReturnsTrue(root.getLeft(), environment)) {
+            List<Lexeme> temp = evalStatementList(root.getRight(), loopEnvir);
+            if (this.returning) {
+                return temp;
+            }
+        }
+        return null;
+    }
+
+    private List<Lexeme> evalIf(Lexeme root, Environment environment) {
+        Environment ifEnvir = new Environment(environment);
+        if (checkIfReturnsTrue(root.getLeft(), environment)) {
+            List<Lexeme> temp = evalStatementList(root.getRight().getLeft(), ifEnvir);
+            if (this.returning) {
+                return temp;
+            }
+        } else {
+            if (root.getRight().getRight() != null) {
+                return eval(root.getRight().getRight(), environment);
+            }
+        }
+        return null;
+    }
+
+    private List<Lexeme> evalElse(Lexeme root, Environment environment) {
+        Environment elseEnvir = new Environment(environment);
+        List<Lexeme> temp = evalStatementList(root.getRight().getLeft(), elseEnvir);
+        if (this.returning) {
+            return temp;
+        }
+        return null;
     }
 
     private boolean checkIfReturnsTrue(Lexeme expression, Environment environment) {
@@ -183,6 +314,57 @@ public class Evaluator {
         return result.get(0).booleanValue;
     }
 
+    private List<Lexeme> createArray(List<Lexeme> expressionValues, Environment environment) {
+        if (expressionValues.size() == 0) {
+            Forest.error(0, "empty expressions for array creation");
+            return null;
+        }
+        Lexeme array = new Lexeme(ARRAY, new Lexeme[expressionValues.get(0).intValue], expressionValues.get(0).getLineNumber());
+        arrayCreationHelper(array, expressionValues, environment);
+        return createSingleList(array);
+    }
+
+    private void arrayCreationHelper(Lexeme array, List<Lexeme> expressionValues, Environment environment) {
+        if (expressionValues.size() == 0) return;
+        if (expressionValues.get(0).getType() != INTEGER) {
+            Forest.error(array.getLineNumber(), "array size must be an integer. Found a " + expressionValues.get(0).getType());
+        }
+        for (int i = 0; i < expressionValues.get(0).intValue; i++) {
+            if (expressionValues.size() == 1) {
+                array.arrayValue[i] = new Lexeme(INTEGER, 0, array.getLineNumber());
+            } else {
+                if (expressionValues.get(1).getType() != INTEGER) {
+                    Forest.error(array.getLineNumber(), "array size must be an integer. Found a " + expressionValues.get(0).getType());
+                }
+                array.arrayValue[i] = new Lexeme(ARRAY, new Lexeme[expressionValues.get(1).intValue], array.getLineNumber());
+                arrayCreationHelper(array.arrayValue[i], expressionValues.subList(1, expressionValues.size()), environment);
+            }
+        }
+    }
+
+    private List<Lexeme> evalUnaryOperation(Lexeme root, Environment environment) {
+        Lexeme operator = root.getLeft();
+        List<Lexeme> expressionVals = eval(root.getRight(), environment);
+        if (expressionVals.size() != 1) {
+            Forest.error(root.getLineNumber(), "invalid number of arguments for operator " + operator.getType() + " expected 1 founnd " + expressionVals.size());
+        }
+        switch (operator.getType()) {
+            case NOT:
+                switch (expressionVals.get(0).getType()) {
+                    case BOOLEAN:
+                        return createSingleList(new Lexeme(BOOLEAN, !(expressionVals.get(0).booleanValue), root.getRight().getLineNumber()));
+                    default:
+                        Forest.error(root.getLineNumber(), "invalid operation: " + operator.getType() + " for type " + expressionVals.get(0).getType());
+                        return null;
+                }
+            case EQUAL:
+                return createSingleList(expressionVals.get(0));
+            default:
+                Forest.error(operator.getLineNumber(), "operator " + operator.getType() + " not supported");
+                return null;
+        }
+    }
+
     private List<Lexeme> variadicOperation(Lexeme root, Environment environment, List<Lexeme> expressionValues) {
         Lexeme opList = root.getLeft();
         Lexeme operator = opList.getLeft();
@@ -192,13 +374,13 @@ public class Evaluator {
             expressionValues = evalExpressionList(root.getRight(), environment);
         }
         int numOfExpressions;
-        if (opList.getRight().getLeft() != null) { //if there is another operator
+        if (opList.getRight() != null && opList.getRight().getLeft() != null) { //if there is another operator
             if (opList.getRight().getRight() == null) numOfExpressions = 2; //if there is no specified number
             else numOfExpressions = opList.getRight().getRight().intValue + 1;
             nextOpList = opList.getRight().getLeft();
         } else {
             numOfExpressions = expressionValues.size();
-            if (opList.getRight().getRight() != null) {
+            if (opList.getRight() != null && opList.getRight().getRight() != null) {
                 if (numOfExpressions != opList.getRight().getRight().intValue + 1) {
                     Forest.error(root.getRight().getLineNumber(), "wrong number of operands for given operation, expected:" + (opList.getRight().getRight().intValue + 1) + " found:" + numOfExpressions);
                 }
@@ -211,30 +393,29 @@ public class Evaluator {
         }
         Lexeme firstOperand = expressionValues.get(0);
         Lexeme secondOperand;
-        for (int i = 1; i < numOfExpressions; i++) {
-            if (firstOperand == null || i >= expressionValues.size()) {
-                if (firstOperand != null && operator.getType() == MINUS) {
-                    switch (firstOperand.getType()) {
-                        case INTEGER:
-                            firstOperand = new Lexeme(INTEGER, -firstOperand.intValue, firstOperand.getLineNumber());
-                            break;
-                        case FLOAT:
-                            firstOperand = new Lexeme(FLOAT, -firstOperand.doubleValue, firstOperand.getLineNumber());
-                            break;
-                        case BOOLEAN:
-                            firstOperand = new Lexeme(INTEGER, -((firstOperand.getLeft().booleanValue) ? 1 : 0), firstOperand.getLineNumber());
-                        case CHARACTER:
-                            firstOperand = new Lexeme(INTEGER, -((int) firstOperand.characterValue), firstOperand.getLineNumber());
-                            break;
-                        default:
-                            Forest.error(firstOperand.getLineNumber(), "invalid operation: " + operator.getType() + " between types " + firstOperand.getType());
-                            return null;
-                    }
-                } else {
-                    Forest.error(firstOperand.getLineNumber(), "not enough operands for given operation, expected:" + numOfExpressions + " found:" + (i + 1));
+        if (operator.getType() == ARRAY_CREATION) {
+            return createArray(expressionValues, environment);
+        }
+        if (firstOperand != null && operator.getType() == MINUS && numOfExpressions == 1) {
+            switch (firstOperand.getType()) {
+                case INTEGER:
+                    firstOperand = new Lexeme(INTEGER, -firstOperand.intValue, firstOperand.getLineNumber());
+                    break;
+                case FLOAT:
+                    firstOperand = new Lexeme(FLOAT, -firstOperand.doubleValue, firstOperand.getLineNumber());
+                    break;
+                case BOOLEAN:
+                    firstOperand = new Lexeme(INTEGER, -((firstOperand.getLeft().booleanValue) ? 1 : 0), firstOperand.getLineNumber());
+                case CHARACTER:
+                    firstOperand = new Lexeme(INTEGER, -((int) firstOperand.characterValue), firstOperand.getLineNumber());
+                    break;
+                default:
+                    Forest.error(firstOperand.getLineNumber(), "invalid operation: " + operator.getType() + " between types " + firstOperand.getType());
                     return null;
-                }
             }
+            return createSingleList(firstOperand);
+        }
+        for (int i = 1; i < numOfExpressions; i++) {
             secondOperand = expressionValues.get(i);
             if (secondOperand == null) {
                 Forest.error(firstOperand.getLineNumber(), "not enough operands for given operation, found null value");
@@ -997,7 +1178,7 @@ public class Evaluator {
                                     firstOperand = new Lexeme(BOOLEAN, firstOperand.doubleValue == ((secondOperand.booleanValue) ? 1 : 0), root.getLineNumber());
                                     break;
                                 case CHARACTER:
-                                    firstOperand = new Lexeme(BOOLEAN, firstOperand.doubleValue == (int) (secondOperand.characterValue), root.getLineNumber());
+                                    firstOperand = new Lexeme(BOOLEAN, firstOperand.doubleValue == (double) (int) (secondOperand.characterValue), root.getLineNumber());
                                     break;
                                 default:
                                     Forest.error(root.getLineNumber(), "invalid operation: " + operator.getType() + " between types " + firstOperand.getType() + " and " + secondOperand.getType());
@@ -1017,6 +1198,16 @@ public class Evaluator {
                                     break;
                                 case CHARACTER:
                                     firstOperand = new Lexeme(BOOLEAN, ((firstOperand.booleanValue) ? 1 : 0) == (int) (secondOperand.characterValue), root.getLineNumber());
+                                    break;
+                                default:
+                                    Forest.error(root.getLineNumber(), "invalid operation: " + operator.getType() + " between types " + firstOperand.getType() + " and " + secondOperand.getType());
+                                    return null;
+                            }
+                            break;
+                        case STRING:
+                            switch (secondOperand.getType()) {
+                                case STRING:
+                                    firstOperand = new Lexeme(BOOLEAN, firstOperand.stringValue.equals(secondOperand.stringValue), root.getLineNumber());
                                     break;
                                 default:
                                     Forest.error(root.getLineNumber(), "invalid operation: " + operator.getType() + " between types " + firstOperand.getType() + " and " + secondOperand.getType());

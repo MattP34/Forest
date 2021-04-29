@@ -62,7 +62,7 @@ public class Parser {
         else if (controlStatementPending()) root = controlStatement();
         else if (funcDeclarationPending()) root = funcDeclaration();
         else {
-            root = expression();
+            root = expressionList();
             if (check(ASSIGN)) root = instantiation(root, true);
         }
         consume(SEMICOLON);
@@ -182,6 +182,13 @@ public class Parser {
         Lexeme lex = consume(IDENTIFIER);
         Lexeme root = new Lexeme(PARAMETER_LIST, lex.getLineNumber());
         root.setLeft(lex);
+        Lexeme node = root.getLeft();
+        while (check(O_SQUARE)) {
+            consume(O_SQUARE);
+            node.setLeft(consume(INTEGER));
+            consume(C_SQUARE);
+            node = node.getLeft();
+        }
         if (check(COMMA)) {
             consume(COMMA);
             root.setRight(parameterList());
@@ -191,11 +198,11 @@ public class Parser {
 
     private Lexeme instantiation(Lexeme expressionTemp, boolean alreadyConsumedExpression) {
         if (debug) System.out.println("-- instantiation --");
-        if (!alreadyConsumedExpression) expressionTemp = expression();
+        if (!alreadyConsumedExpression) expressionTemp = expressionList();
         Lexeme root = new Lexeme(ASSIGN, expressionTemp.getLineNumber());
         root.setRight(expressionTemp);
         consume(ASSIGN);
-        root.setLeft(consume(IDENTIFIER));
+        root.setLeft(parameterList());
         return root;
     }
 
@@ -297,8 +304,8 @@ public class Parser {
         }
         if (check(DOLLAR_SIGN)) {
             consume(DOLLAR_SIGN);
-            root.getRight().setLeft(operatorList());
         }
+        root.getRight().setLeft(operatorList());
         return root;
     }
 
@@ -309,8 +316,8 @@ public class Parser {
         else if (booleanOperatorPending()) return booleanOperator();
         else if (check(ARRAY_CREATION)) return consume(ARRAY_CREATION);
         else {
+            Forest.error(currentLexeme.getLineNumber(), " invalid operator " + currentLexeme.getType());
             return null;
-            //call error TODO
         }
     }
 
@@ -318,10 +325,9 @@ public class Parser {
         if (debug) System.out.println("-- binary operator --");
         if (check(NOT)) return consume(NOT);
         else if (check(EQUAL)) return consume(EQUAL);
-        else if (check(MINUS)) return consume(MINUS);
         else {
+            Forest.error(currentLexeme.getLineNumber(), " invalid operator " + currentLexeme.getType());
             return null;
-            //call error TODO
         }
     }
 
@@ -333,8 +339,8 @@ public class Parser {
         else if (check(LESS_THAN_OR_EQUAL)) return consume(LESS_THAN_OR_EQUAL);
         else if (check(EQUALS)) return consume(EQUALS);
         else {
+            Forest.error(currentLexeme.getLineNumber(), " invalid comparator " + currentLexeme.getType());
             return null;
-            //call error TODO
         }
     }
 
@@ -346,8 +352,8 @@ public class Parser {
         else if (check(DIVIDE)) return consume(DIVIDE);
         else if (check(POWER)) return consume(POWER);
         else {
+            Forest.error(currentLexeme.getLineNumber(), " invalid operator " + currentLexeme.getType());
             return null;
-            //call error TODO
         }
     }
 
@@ -356,8 +362,8 @@ public class Parser {
         if (check(OR)) return consume(OR);
         else if (check(AND)) return consume(AND);
         else {
+            Forest.error(currentLexeme.getLineNumber(), " invalid operator " + currentLexeme.getType());
             return null;
-            //call error TODO
         }
     }
 
@@ -412,7 +418,7 @@ public class Parser {
     }
 
     private boolean unaryOperatorPending() {
-        return check(NOT) || check(EQUAL) || check(MINUS);
+        return check(NOT) || check(EQUAL);
     }
 
     private boolean funcCallPending() {
@@ -435,7 +441,7 @@ public class Parser {
         return comparatorPending() ||
                 mathOperatorPending() ||
                 booleanOperatorPending() ||
-                check(O_SQUARE);
+                check(ARRAY_CREATION);
     }
 
     private boolean comparatorPending() {

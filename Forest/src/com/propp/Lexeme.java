@@ -6,6 +6,7 @@ public class Lexeme {
     private final TokenType type;
     private final int lineNumber;
 
+    public final Lexeme[] arrayValue;
     public final String stringValue;
     public final Integer intValue;
     public final Double doubleValue;
@@ -22,6 +23,7 @@ public class Lexeme {
         this.doubleValue = null;
         this.booleanValue = null;
         this.characterValue = null;
+        this.arrayValue = null;
         constructerHelper();
     }
 
@@ -33,6 +35,7 @@ public class Lexeme {
         this.doubleValue = null;
         this.booleanValue = null;
         this.characterValue = null;
+        this.arrayValue = null;
         constructerHelper();
     }
 
@@ -44,6 +47,7 @@ public class Lexeme {
         this.doubleValue = null;
         this.booleanValue = null;
         this.characterValue = null;
+        this.arrayValue = null;
         constructerHelper();
     }
 
@@ -55,6 +59,7 @@ public class Lexeme {
         this.intValue = null;
         this.booleanValue = null;
         this.characterValue = null;
+        this.arrayValue = null;
         constructerHelper();
     }
 
@@ -66,6 +71,7 @@ public class Lexeme {
         this.intValue = null;
         this.doubleValue = null;
         this.characterValue = null;
+        this.arrayValue = null;
         constructerHelper();
     }
 
@@ -77,6 +83,19 @@ public class Lexeme {
         this.intValue = null;
         this.doubleValue = null;
         this.characterValue = Character.valueOf(characterValue);
+        this.arrayValue = null;
+        constructerHelper();
+    }
+
+    public Lexeme(TokenType type, Lexeme[] arrayValue, int lineNumber) {
+        this.type = type;
+        this.lineNumber = lineNumber;
+        this.booleanValue = null;
+        this.stringValue = null;
+        this.intValue = null;
+        this.doubleValue = null;
+        this.characterValue = null;
+        this.arrayValue = arrayValue;
         constructerHelper();
     }
 
